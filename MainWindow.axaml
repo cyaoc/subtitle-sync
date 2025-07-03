@@ -1,0 +1,351 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:subtitle_sync.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+        x:Class="subtitle_sync.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding AppTitle}"
+        Width="900" Height="500"
+        MinWidth="700" MinHeight="400"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <DockPanel>
+        <!-- 顶部标题栏 -->
+        <Border DockPanel.Dock="Top" Background="#FF2D2D30" Padding="20,15">
+            <Grid>
+                <TextBlock Text="{Binding AppTitle}" 
+                           FontSize="18" 
+                           FontWeight="Bold" 
+                           Foreground="White" 
+                           HorizontalAlignment="Center"/>
+                
+                <!-- 语言选择器 -->
+                <ComboBox ItemsSource="{Binding SupportedLanguages}"
+                          SelectedItem="{Binding SelectedLanguage}"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center"
+                          MinWidth="100"
+                          Background="White">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayName}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </Grid>
+        </Border>
+
+        <!-- 底部状态栏 -->
+        <Border DockPanel.Dock="Bottom" Background="#FFF0F0F0" Padding="20,10" BorderBrush="#FFCCCCCC" BorderThickness="0,1,0,0">
+            <TextBlock Text="{Binding StatusMessage}" 
+                       FontSize="12" 
+                       Foreground="#FF666666" 
+                       HorizontalAlignment="Left"/>
+        </Border>
+
+        <!-- 主内容区域 -->
+        <Grid Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*" MinWidth="280"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左侧文件区域 -->
+            <Border Grid.Column="0" 
+                    Margin="20,20,10,20"
+                    Background="#FFF8F8F8"
+                    BorderBrush="#FFDDDDDD"
+                    BorderThickness="2"
+                    CornerRadius="10"
+                    Name="DropZone"
+                    DragDrop.AllowDrop="True">
+                
+                <Grid>
+                    <!-- 空状态显示 -->
+                    <StackPanel VerticalAlignment="Center" 
+                               HorizontalAlignment="Center" 
+                               Spacing="20"
+                               IsVisible="{Binding !ConversionItems.Count}">
+                    
+                    <!-- 拖拽提示图标 -->
+                    <Border Width="80" Height="80" 
+                           Background="#FFE8E8E8" 
+                           CornerRadius="40">
+                        <TextBlock Text="📁" 
+                                  FontSize="36" 
+                                  HorizontalAlignment="Center" 
+                                  VerticalAlignment="Center"/>
+                    </Border>
+
+                    <!-- 默认提示 -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{Binding DragHereText}" 
+                                  FontSize="18" 
+                                  FontWeight="SemiBold" 
+                                  HorizontalAlignment="Center" 
+                                  Foreground="#FF666666"/>
+                        <TextBlock Text="{Binding SupportedFormatsText}" 
+                                  FontSize="12" 
+                                  HorizontalAlignment="Center" 
+                                  Foreground="#FF999999"/>
+                    </StackPanel>
+
+                    <!-- 选择文件按钮 -->
+                    <Button Content="{Binding SelectFilesButtonText}" 
+                           Command="{Binding SelectFilesCommand}"
+                           Padding="24,12" 
+                           FontSize="14"
+                           Background="#FF007ACC"
+                           Foreground="White"
+                           BorderThickness="0"
+                           CornerRadius="6"
+                           HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                    <!-- 文件列表模式 -->
+                    <Grid IsVisible="{Binding ConversionItems.Count}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 标题栏 -->
+                    <Border Grid.Row="0" Background="#FFE9E9E9" Padding="15,10" CornerRadius="8,8,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="📋" FontSize="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding FileCountInfo}" 
+                                          FontSize="14" 
+                                          FontWeight="SemiBold" 
+                                          VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding CompletedFilesInfo}" 
+                                          FontSize="12" 
+                                          Foreground="#FF666666"
+                                          VerticalAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <Button Grid.Column="1"
+                                   Content="{Binding ClearAllText}"
+                                   Command="{Binding ClearFilesCommand}"
+                                   Padding="8,4"
+                                   FontSize="12"
+                                   Background="#FFDC3545"
+                                   Foreground="White"
+                                   BorderThickness="0"
+                                   CornerRadius="4"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 文件列表 -->
+                    <ScrollViewer Grid.Row="1" 
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding ConversionItems}" Margin="5">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" 
+                                           BorderBrush="#FFDDDDDD" 
+                                           BorderThickness="1" 
+                                           CornerRadius="6" 
+                                           Margin="5"
+                                           Padding="12">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!-- 文件名 -->
+                                            <TextBlock Grid.Row="0" Grid.Column="0"
+                                                     Text="{Binding FileName}" 
+                                                     FontSize="13" 
+                                                     FontWeight="SemiBold" 
+                                                     Foreground="#FF333333"/>
+
+                                            <!-- 格式信息 -->
+                                            <StackPanel Grid.Row="1" Grid.Column="0" 
+                                                       Orientation="Horizontal" 
+                                                       Spacing="5" 
+                                                       Margin="0,4,0,0">
+                                                <TextBlock Text="{Binding InputFormatDisplay}" 
+                                                          FontSize="11" 
+                                                          Foreground="#FF666666"/>
+                                                <TextBlock Text="→" 
+                                                          FontSize="11" 
+                                                          Foreground="#FF999999"/>
+                                                <TextBlock Text="{Binding OutputFormatDisplay}" 
+                                                          FontSize="11" 
+                                                          Foreground="#FF666666"/>
+                                            </StackPanel>
+
+                                            <!-- 状态和消息 -->
+                                            <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
+                                                       Orientation="Horizontal" 
+                                                       Spacing="8" 
+                                                       Margin="0,4,0,0">
+                                                <TextBlock Text="{Binding StatusText}" 
+                                                          FontSize="11" 
+                                                          FontWeight="SemiBold"
+                                                          Foreground="{Binding StatusColor}"/>
+                                                <TextBlock Text="{Binding Message}" 
+                                                          FontSize="11" 
+                                                          Foreground="#FF888888"/>
+                                            </StackPanel>
+
+                                            <!-- 进度条 -->
+                                            <ProgressBar Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
+                                                        Value="{Binding Progress}"
+                                                        Width="60"
+                                                        Height="4"
+                                                        VerticalAlignment="Center"
+                                                        Margin="10,0"
+                                                        Background="#FFE0E0E0"
+                                                        Foreground="#FF007ACC"/>
+
+                                            <!-- 删除按钮 -->
+                                            <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+                                                   Content="✕"
+                                                   Command="{Binding $parent[Window].DataContext.RemoveFileCommand}"
+                                                   CommandParameter="{Binding}"
+                                                   Width="24"
+                                                   Height="24"
+                                                   FontSize="12"
+                                                   Background="Transparent"
+                                                   Foreground="#FF999999"
+                                                   BorderThickness="0"
+                                                   VerticalAlignment="Top"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- 底部操作栏 -->
+                    <Border Grid.Row="2" Background="#FFF0F0F0" Padding="15,10" CornerRadius="0,0,8,8">
+                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                            <Button Content="{Binding AddFilesText}"
+                                   Command="{Binding SelectFilesCommand}"
+                                   Padding="12,6"
+                                   FontSize="12"
+                                   Background="#FF007ACC"
+                                   Foreground="White"
+                                   BorderThickness="0"
+                                   CornerRadius="4"/>
+                            <Button Content="{Binding ClearAllText}"
+                                   Command="{Binding ClearFilesCommand}"
+                                   Padding="12,6"
+                                   FontSize="12"
+                                   Background="#FF6C757D"
+                                   Foreground="White"
+                                   BorderThickness="0"
+                                   CornerRadius="4"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                </Grid>
+            </Border>
+
+            <!-- 分隔线 -->
+            <Rectangle Grid.Column="1" Width="1" Fill="#FFDDDDDD" Margin="0,40"/>
+
+            <!-- 右侧控制面板 -->
+            <StackPanel Grid.Column="2" 
+                       Margin="10,20,20,20" 
+                       Spacing="25">
+
+                <!-- 输出格式选择 -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{Binding OutputFormatText}" 
+                              FontSize="14" 
+                              FontWeight="SemiBold" 
+                              Foreground="#FF333333"/>
+                    <ComboBox ItemsSource="{Binding SupportedOutputFormats}"
+                             SelectedItem="{Binding SelectedOutputFormat}"
+                             Padding="12,8"
+                             FontSize="13"
+                             Background="White"
+                             BorderBrush="#FFDDDDDD">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- 转换按钮 -->
+                <Button Content="{Binding StartConvertText}" 
+                       Command="{Binding ConvertCommand}"
+                       IsEnabled="{Binding !IsConverting}"
+                       Padding="0,16" 
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Background="#FF28A745"
+                       Foreground="White"
+                       BorderThickness="0"
+                       CornerRadius="8"
+                       HorizontalAlignment="Stretch"
+                       HorizontalContentAlignment="Center"/>
+
+                <!-- 转换中提示 -->
+                <StackPanel Spacing="8" IsVisible="{Binding IsConverting}">
+                    <!-- 批量转换进度条 -->
+                    <ProgressBar Value="{Binding OverallProgress}"
+                                Height="6" 
+                                Background="#FFE0E0E0" 
+                                Foreground="#FF28A745"/>
+                    
+                    <TextBlock Text="{Binding StatusMessage}" 
+                              FontSize="12" 
+                              HorizontalAlignment="Center" 
+                              Foreground="#FF666666"/>
+                </StackPanel>
+
+                <!-- 帮助提示 -->
+                <Border Background="#FFF9F9F9" 
+                       BorderBrush="#FFEEEEEE" 
+                       BorderThickness="1" 
+                       Padding="16,12" 
+                       CornerRadius="6"
+                       Margin="0,20,0,0">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding TipsText}" 
+                                  FontSize="12" 
+                                  FontWeight="SemiBold" 
+                                  Foreground="#FF666666"/>
+                        <TextBlock Text="{Binding Tip1Text}" 
+                                  FontSize="11" 
+                                  Foreground="#FF888888"/>
+                        <TextBlock Text="{Binding Tip2Text}" 
+                                  FontSize="11" 
+                                  Foreground="#FF888888"/>
+                        <TextBlock Text="{Binding Tip3Text}" 
+                                  FontSize="11" 
+                                  Foreground="#FF888888"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>
