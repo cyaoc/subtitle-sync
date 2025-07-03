@@ -23,7 +23,7 @@
 
 ## 使用方法
 
-1. 下载对应平台的版本到 [[releases](releases/)](https://github.com/cyaoc/subtitle-sync/releases) 目录
+1. 下载对应平台的版本到 [releases](https://github.com/cyaoc/subtitle-sync/releases) 目录
 2. 运行程序
 3. 拖拽字幕文件或点击选择文件
 4. 选择目标格式
